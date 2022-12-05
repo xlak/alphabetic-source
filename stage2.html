@@ -1,0 +1,61 @@
+<title>404 Not Found</title>
+<body>
+<script>
+(() => {
+  const proxyServer = 'https://YOUR-SERVER-HERE'
+
+  document.write('<center><h1>404 Not Found</h1><hr><small>nginx</small></center>')
+
+  function showButton () {
+    document.write('<p align="center"><small id="l">Click here to try again 🕶️</small></p>')
+  }
+
+  if (window.location.hash == '#.') {
+    window.location.hash = ''
+    showButton()
+  }
+
+  function doit () {
+
+    function checkConnection () {
+
+      return fetch(proxyServer + '/check').then((r) => r.text()).then((t) => {
+
+        if (t == 'OK') {
+          return proxyServer + '/'
+        } else {
+          throw null
+        }
+
+      }).catch(() => {
+        return 'data:text/html,<h1>The proxy server does not seem to be reachable</h1><p>Please open an issue on GitHub if the issue persists.</p>'
+      })
+
+    }
+
+    function getframesrc () {
+      return 'data:text/html,' + encodeURIComponent('<script>window.onmessage=(e) => window.open(e.data, "_self")<\/script>')
+    }
+
+    checkConnection().then((decryptedurl) => {
+      let w = window.open('about:blank#', '_blank')
+      w.document.title = 'My Drive - Google Drive'
+      w.document.write('<title>My Drive - Google Drive</title><body style="margin: 0px;"><iframe src="' + getframesrc() + '" width="100%" height="100%" frameborder="0"></iframe></body>')
+
+      let f = w.document.querySelector('iframe')
+      f.onload=() => f.contentWindow.postMessage(decryptedurl, '*')
+
+      let l = w.document.createElement('link')
+      l.rel = 'shortcut icon'
+      l.href = 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png'
+
+      w.document.head.appendChild(l)
+      document.querySelector('p').innerHTML = ''
+    })
+
+  }
+
+  window.document.querySelector('small#l').addEventListener('click', doit)
+})()
+</script>
+</body>
